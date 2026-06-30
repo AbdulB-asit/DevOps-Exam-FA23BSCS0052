@@ -1,0 +1,81 @@
+# ==========================================
+# Dependencies & Package Managers
+# ==========================================
+node_modules/
+/frontend/node_modules/
+/backend/node_modules/
+.npm
+.eslintcache
+.stylelintcache
+
+# ==========================================
+# Production / Build Outputs
+# ==========================================
+dist/
+build/
+out/
+/frontend/dist/
+/backend/dist/
+
+# ==========================================
+# Environment Variables & Secrets (CRITICAL)
+# ==========================================
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.*.local
+
+# Backup/Secret files
+*.pem
+*.key
+*.cert
+jwt_secret*
+
+# ==========================================
+# Database (MongoDB Local Data & Dumps)
+# ==========================================
+data/
+db/
+mongo-data/
+*.dump
+*.bson
+*.json-dump
+
+# ==========================================
+# Operating System & IDE Specific Files
+# ==========================================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+Ehthumbs.db
+Desktop.ini
+
+# IDEs (VS Code, WebStorm, etc.)
+.vscode/
+!.vscode/extensions.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+
+# ==========================================
+# Testing & Diagnostics
+# ==========================================
+coverage/
+.nyc_output
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pids
+*.pid
+*.seed
+*.pid.lock

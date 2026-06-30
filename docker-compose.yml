@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  database:
+    image: mongo:latest
+    container_name: phoenix-db
+    ports:
+      - "27017:27017" 
+    volumes:
+      - phoenix_db_data:/data/db # Sabotage 2 Defeated: Named volume mapped to Mongo's internal storage
+
+  api:
+    build: .
+    container_name: phoenix-api
+    ports:
+      - "8080:5000" # Host 8080 mapped to Container 5000
+    environment:
+      # Sabotage 1 Defeated: Using the exact variable index.js expects, and Docker's internal DNS ('database')
+      - DATABASE_URI=mongodb://database:27017/phoenix
+    depends_on:
+      - database
+
+volumes:
+
+  phoenix_db_data:

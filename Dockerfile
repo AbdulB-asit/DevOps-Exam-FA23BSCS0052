@@ -1,46 +1,45 @@
-# ==========================================
-# STAGE 1: Build Frontend & Production Modules
-# ==========================================
+# =========================================================================
+# STAGE 1: Compilation, Dependency Resolution & Artifact Preparation
+# =========================================================================
 FROM node:20-alpine AS builder
 
-WORKDIR /app
+WORKDIR /src
 
-# Copy package configurations and install ALL dependencies
+# Leverage caching layers for node modules to accelerate iterative builds
 COPY package*.json ./
 RUN npm install
 
-# Copy source files and compile the Vite frontend build
+# Build minified frontend static bundle using the Vite compiler configuration
 COPY . .
 RUN npm run build
 
-# Prune devDependencies cleanly before moving to the final stage
-RUN npm prune --production && npm cache clean --force
+# Strip devDependencies and purge developer artifacts to shrink build context
+RUN npm prune --production && \
+    find node_modules/ -type f -name "*.md" -o -name "*.map" -o -name "*.ts" -delete && \
+    npm cache clean --force
 
-# ==========================================
-# STAGE 2: Ultra-minimal Runtime Environment
-# ==========================================
-# Official Google Distroless Node 20 runtime image (~40MB base)
-FROM gcr.io/distroless/nodejs20-debian12 AS runner
+# =========================================================================
+# STAGE 2: Hardened, Non-Root Runtime Execution Layer (Minimal Footprint)
+# =========================================================================
+FROM alpine:3.20 AS runtime
 
 WORKDIR /app
 
-# Copy the lightweight, pruned production node_modules from Stage 1
-COPY --from=builder /app/node_modules ./node_modules
+# Provision minimum engine dependencies and instantiate low-privilege system identities
+RUN apk add --no-cache nodejs && \
+    addgroup -g 1000 node && \
+    adduser -u 1000 -G node -s /bin/sh -D node && \
+    mkdir -p /app/logs && \
+    chown -R node:node /app
 
-# Copy application manifest files
-COPY --from=builder /app/package*.json ./
+# Port compiled modules, the entrypoint script, and distribution maps safely
+COPY --chown=node:node --from=builder /src/node_modules ./node_modules
+COPY --chown=node:node --from=builder /src/package*.json ./
+COPY --chown=node:node --from=builder /src/index.js ./
+COPY --chown=node:node --from=builder /src/dist ./dist
 
-# Copy the backend server entry point
-COPY --from=builder /app/index.js ./
-
-# Copy the compiled static frontend files from Stage 1
-COPY --from=builder /app/dist ./dist
-
-# Set production environment flags
 ENV NODE_ENV=production
-
-# Expose the application port
+USER node
 EXPOSE 5000
 
-# Run the node binary directly on index.js (Distroless requires array syntax)
-CMD ["index.js"]
+CMD ["node", "index.js"]

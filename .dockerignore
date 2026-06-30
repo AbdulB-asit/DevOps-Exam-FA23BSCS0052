@@ -1,0 +1,58 @@
+# ==========================================
+# Dependencies (Crucial to ignore!)
+# ==========================================
+# Prevents host node_modules from polluting the container. 
+# The container will run its own clean 'npm install'.
+node_modules/
+/frontend/node_modules/
+/backend/node_modules/
+.npm/
+
+# ==========================================
+# Local Build Outputs
+# ==========================================
+# Ignore your local production builds so they don't overwrite 
+# or conflict with the fresh build taking place inside the container.
+dist/
+build/
+out/
+
+# ==========================================
+# Git and Repository History
+# ==========================================
+# Keeps the extensive git commit history (.git folder) out of the build 
+# context, saving significant transfer time and context memory.
+.git
+.gitignore
+.github/
+README.md
+
+# ==========================================
+# Environment Variables & Secrets
+# ==========================================
+# Prevents hardcoding or accidentally baking local secret files 
+# into the Docker image layers.
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+*.cert
+
+# ==========================================
+# IDEs and OS Metadata
+# ==========================================
+# Prevents unnecessary system metadata transfers
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# ==========================================
+# Logs and Diagnostics
+# ==========================================
+# Keeps debug logs out of your image layers
+*.log
+npm-debug.log*
+coverage/
+.nyc_output/
